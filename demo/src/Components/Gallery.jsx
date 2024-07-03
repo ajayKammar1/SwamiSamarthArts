@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import axios from "axios";
 import BG from "./1.jfif";
+
 const GalleryContainer = styled.div`
   max-width: 800px;
   margin: 0 auto;
@@ -26,6 +27,7 @@ const AddItem = styled.div`
   align-items: center;
   justify-content: center;
 `;
+
 const Input = styled.input`
   margin: 20px;
   padding: 10px;
@@ -65,6 +67,23 @@ const ModalImage = styled.img`
   border-radius: 8px;
 `;
 
+const DeleteButton = styled.button`
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #c82333;
+  }
+`;
+
 const Gallery = () => {
   const [images, setImages] = useState([]);
   const [newImage, setNewImage] = useState("");
@@ -72,13 +91,24 @@ const Gallery = () => {
   const [selectedImage, setSelectedImage] = useState("");
   const Role = localStorage.getItem("role");
 
+  useEffect(() => {
+    axios
+      .get("/Images/")
+      .then((res) => setImages(res.data))
+      .catch((err) => console.log(err));
+  }, [newImage]);
+
   const handleAddImage = async () => {
     const formData = new FormData();
     formData.append("image", newImage);
-    console.log(newImage);
 
     try {
       await axios.post("/Images/Upload", formData);
+      // Refresh images after upload
+      axios
+        .get("/Images/")
+        .then((res) => setImages(res.data))
+        .catch((err) => console.log(err));
     } catch (error) {
       console.error("Error uploading image:", error);
     }
@@ -93,43 +123,49 @@ const Gallery = () => {
     setIsModalOpen(false);
     setSelectedImage("");
   };
-  useEffect(() => {
-    axios
-      .get("/Images/")
-      .then((res) => setImages(res.data))
-      .catch((err) => console.log(err));
-  }, []);
+
+  const handleDeleteImage = async (imgId) => {
+    try {
+      await axios.delete(`/Images/${imgId}`);
+      // Filter out the deleted image from the state
+      setImages(images.filter((img) => img._id !== imgId));
+    } catch (error) {
+      console.error("Error deleting image:", error);
+    }
+  };
+
   return (
     <div style={{ backgroundColor: "#f3f4f5f2" }}>
       <div style={{ display: "flex", justifyContent: "center" }}>
-        {" "}
         <img src={BG} alt="#" width={500} />
       </div>
-      {Role === "Admin" ? (
+      {Role === "Admin" && (
         <AddItem>
           <Input
             type="file"
             placeholder="Select Image"
-            // value={newImage}
             onChange={(e) => {
               setNewImage(e.target.files[0]);
             }}
           />
           <Button onClick={handleAddImage}>Add Image</Button>
         </AddItem>
-      ) : (
-        ""
       )}
       <GalleryContainer>
-        {images &&
-          images.map((img, index) => (
+        {images.map((img, index) => (
+          <div key={index} style={{ position: "relative" }}>
             <Image
-              key={index}
               src={img.ImgURL}
               alt={`Gallery ${index}`}
               onClick={() => handleImageClick(img.ImgURL)}
             />
-          ))}
+            {Role === "Admin" && (
+              <DeleteButton onClick={() => handleDeleteImage(img._id)}>
+                X
+              </DeleteButton>
+            )}
+          </div>
+        ))}
       </GalleryContainer>
       <Modal isOpen={isModalOpen} onClick={handleCloseModal}>
         <ModalImage src={selectedImage} alt="Selected" />
