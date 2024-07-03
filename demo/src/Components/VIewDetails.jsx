@@ -74,10 +74,30 @@ const Button = styled.button`
   }
 `;
 
+const Modal = styled.div`
+  display: ${({ isOpen }) => (isOpen ? "flex" : "none")};
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  justify-content: center;
+  align-items: center;
+`;
+
+const ModalImage = styled.img`
+  max-width: 90%;
+  max-height: 90%;
+  border-radius: 8px;
+`;
+
 const ViewDetails = () => {
   const [data, setData] = useState();
   const [addURL, setURL] = useState("");
   const [qrCodeURL, setQRCodeURL] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalImage, setModalImage] = useState("");
   const { id, bill } = useParams();
   const Role = localStorage.getItem("role");
   const Navigete = useNavigate();
@@ -112,6 +132,17 @@ const ViewDetails = () => {
         console.log(err);
       });
   };
+
+  const openModal = (imageUrl) => {
+    setModalImage(imageUrl);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setModalImage("");
+  };
+
   return (
     <>
       <Container isPrinting={qrCodeURL !== ""}>
@@ -122,8 +153,16 @@ const ViewDetails = () => {
             justifyContent: "space-between",
           }}
         >
-          <ProfileImage src={data && data.imageUrl} alt="Profile" />
-          <QRCodeGen URL={addURL} setQRCodeURL={setQRCodeURL} />
+          <ProfileImage
+            src={data && data.imageUrl}
+            alt="Profile"
+            onClick={() => openModal(data && data.imageUrl)}
+          />
+          <QRCodeGen
+            URL={addURL}
+            setQRCodeURL={setQRCodeURL}
+            onClick={() => openModal(data && data.imageUrl)}
+          />
         </div>
         <Info>
           <Label>Name:</Label>
@@ -187,6 +226,10 @@ const ViewDetails = () => {
           ""
         )}
       </div>
+
+      <Modal isOpen={isModalOpen} onClick={closeModal}>
+        <ModalImage src={modalImage} alt="Profile" />
+      </Modal>
     </>
   );
 };
