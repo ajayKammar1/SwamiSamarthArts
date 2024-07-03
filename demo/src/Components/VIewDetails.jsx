@@ -7,6 +7,7 @@ import axios from "axios";
 const Container = styled.div`
   padding: 20px;
   max-width: 600px;
+  min-width: 400px;
   width: 40%;
   margin: 20px auto;
   border-radius: 10px;

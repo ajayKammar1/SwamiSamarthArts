@@ -24,11 +24,15 @@ const Row = styled.tr``;
 const TH = styled.th`
   background-color: #020211;
   color: white;
-  width: 120px;
-  padding: 0.5rem 0;
+  width: 200px;
+  padding: 0.5rem 1rem;
+  white-space: nowrap;
+
+  text-overflow: ellipsis;
 `;
 const TD = styled.td`
   text-align: center;
+  width: 200px;
 `;
 const Add = styled.button`
   margin-right: 30px;
@@ -61,7 +65,7 @@ const Button = styled.button`
   }
 `;
 const Input = styled.input`
-  width: 25%;
+  width: 50%;
   padding: 10px;
   font-size: 16px;
   border: 1px solid #ccc;
