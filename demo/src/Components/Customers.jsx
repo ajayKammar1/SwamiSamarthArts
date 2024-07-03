@@ -75,7 +75,7 @@ const Customers = () => {
   const [Orders, setOrders] = useState([]);
   useEffect(() => {
     axios
-      .get("http://localhost:4000/Order")
+      .get("/Order")
       .then((response) => {
         setOrders(response.data);
         setFilteredData(response.data);

@@ -65,7 +65,7 @@ function LoginPage() {
 
     try {
       // Make POST request using Axios
-      const response = await axios.post("http://localhost:4000/user/login", {
+      const response = await axios.post("/user/login", {
         UserID,
         password,
       });

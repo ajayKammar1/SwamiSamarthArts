@@ -90,7 +90,7 @@ const EntryForm = () => {
     });
 
     try {
-      await axios.post("http://localhost:4000/Order", data);
+      await axios.post("/Order", data);
       // fetchOrders();
       setFormData({
         name: "",
@@ -117,10 +117,7 @@ const EntryForm = () => {
       data.append(key, formData[key]);
     });
     try {
-      const res = await axios.patch(
-        `http://localhost:4000/Order/${OrderData._id}`,
-        data
-      );
+      const res = await axios.patch(`/Order/${OrderData._id}`, data);
       console.log(res);
       navigate("/Order"); // Redirect to the orders page after successful update
     } catch (error) {

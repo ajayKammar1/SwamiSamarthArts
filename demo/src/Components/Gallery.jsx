@@ -78,7 +78,7 @@ const Gallery = () => {
     console.log(newImage);
 
     try {
-      await axios.post("http://localhost:4000/Images/Upload", formData);
+      await axios.post("/Images/Upload", formData);
     } catch (error) {
       console.error("Error uploading image:", error);
     }
@@ -95,7 +95,7 @@ const Gallery = () => {
   };
   useEffect(() => {
     axios
-      .get("http://localhost:4000/Images/")
+      .get("/Images/")
       .then((res) => setImages(res.data))
       .catch((err) => console.log(err));
   }, []);

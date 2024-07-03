@@ -82,7 +82,7 @@ const ViewDetails = () => {
   const Navigete = useNavigate();
   useEffect(() => {
     axios
-      .get(`http://localhost:4000/Order/${id}/${bill}`)
+      .get(`/Order/${id}/${bill}`)
       .then((res) => {
         setData(res.data);
         setURL(window.location.href);
@@ -102,7 +102,7 @@ const ViewDetails = () => {
 
   const DeleteOrder = () => {
     axios
-      .delete(`http://localhost:4000/Order/${id}`)
+      .delete(`/Order/${id}`)
       .then((res) => {
         setData(res.data);
         Navigete("/Order/");
