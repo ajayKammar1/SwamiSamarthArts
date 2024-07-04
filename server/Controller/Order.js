@@ -92,42 +92,44 @@ const getSingleInvice = async (req, res) => {
 
 const UpdateOrder = async (req, res) => {
   const orderId = req.params.id;
-  const {
-    name,
-    contactNo,
-    additionalDetails,
-
-    ganpatiModule,
-    price,
-    advance,
-    balance,
-    room,
-  } = req.body;
-  console.log(req.body);
+  console.log("Entery Data : ", req.body);
   const data = {};
   for (const key in req.body) {
     if (req.body[key] !== "" && req.body[key] !== "null") {
       data[key] = req.body[key];
     }
   }
-
+  console.log("Updating Data :", data);
   try {
     // Check if there's a file to upload
     if (!req.file) {
       // If no new image, update without changing the image
-      const updatedOrder = await Order.findByIdAndUpdate(
-        orderId,
-        data,
-
-        { new: true }
-      );
-
-      res.status(200).json({
-        message: "Order updated successfully!",
-        order: updatedOrder,
+      const updatedOrder = await Order.findByIdAndUpdate(orderId, data, {
+        new: true,
       });
+      res
+        .status(200)
+        .json({ message: "Order updated successfully!", order: updatedOrder });
       return;
     }
+    // Delete Old Image
+
+    const OrderData = await Order.findById(req.params.id);
+    if (!OrderData) {
+      return res.status(404).json({ error: "Image not found." });
+    }
+
+    const publicId = OrderData.imageUrl.split("/").pop().split(".")[0]; // Extract public ID from the URL
+    // console.log(publicId)
+    // Delete image from Cloudinary
+    cloudinary.uploader.destroy(publicId, async (error, result) => {
+      if (error) {
+        return res
+          .status(500)
+          .json({ error: "Failed to delete image from Cloudinary." });
+      }
+      console.log({ message: "Image deleted successfully." });
+    });
 
     // If there's a new image, upload it to Cloudinary
     cloudinary.uploader
@@ -137,14 +139,15 @@ const UpdateOrder = async (req, res) => {
             .status(500)
             .json({ error: "Failed to upload image to Cloudinary." });
         }
-
         const imageUrl = result.secure_url;
-        console.log(imageUrl);
+        console.log("Data with URL :", { ...data, imageUrl });
 
         // Update order with new image URL
-        const updatedOrder = await Order.findByIdAndUpdate(orderId, data, {
-          new: true,
-        });
+        const updatedOrder = await Order.findByIdAndUpdate(
+          orderId,
+          { ...data, imageUrl },
+          { new: true }
+        );
 
         res.status(200).json({
           message: "Order updated successfully!",
@@ -166,8 +169,7 @@ const deleteOrder = async (req, res) => {
     }
 
     const publicId = OrderData.imageUrl.split("/").pop().split(".")[0]; // Extract public ID from the URL
-    // console.log(publicId);
-
+    // console.log(publicId)
     // Delete image from Cloudinary
     cloudinary.uploader.destroy(publicId, async (error, result) => {
       if (error) {
